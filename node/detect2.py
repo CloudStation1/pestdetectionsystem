@@ -6,13 +6,13 @@ def setModelConfig():
     model.conf = 0.50
 
 def runDetection(img):
-    results = model()
+    results = model(img)
     results.print()
     results.save()
 
 def main():
     im = './test_data/test.jpg'
-    runDetection('https://www.youtube.com/watch?v=Xel7qALbrRI')
+    runDetection(im)
 
 if __name__ == "__main__":
     main()
