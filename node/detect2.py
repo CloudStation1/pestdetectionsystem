@@ -1,5 +1,5 @@
 import torch
-import picamera2
+from picamera2 import Picamera2
 import time
 
 class ratDetection:
@@ -16,7 +16,7 @@ class ratDetection:
     def setModelConfig(self, confidance=0.4):
         self.confidance = confidance
 
-    def get_camera_feed():
+    def get_camera_feed(self):
         picam = Picamera2()
         picam.start()
         return picam
