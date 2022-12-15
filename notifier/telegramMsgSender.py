@@ -13,5 +13,8 @@ class notifier:
         self.chat_id = os.getenv('CHAT')
         self.bot = telebot.TeleBot(api_key)
 
-    def sendTelegramMsg(self, message):
+    def sendMsg(self, message):
         self.bot.send_message(self.chat_id, message)
+    
+    def sendPhoto(self, file, msg=''):
+        self.bot.send_photo(self.chat_id, file, msg)
