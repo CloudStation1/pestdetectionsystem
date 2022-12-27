@@ -5,8 +5,13 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 9000
+    - name: api
+      port: 9000
       targetPort: 9000
+      protocol: TCP
+    - name: browser
+      port: 35585 
+      targetPort: 35585
       protocol: TCP
   selector:
     app: minio
