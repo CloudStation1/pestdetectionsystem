@@ -1,6 +1,8 @@
 import torch
 from picamera2 import Picamera2
+from notifier import telegramMsgSender as tele
 import time
+import numpy as np
 
 class ratDetection:
 
@@ -33,9 +35,11 @@ class ratDetection:
         time.sleep(1)
 
         while True:
+            t1 = time()
             frame = cam.capture_array()
-            results = self.runDetection(frame)
-            break
+            #results = self.runDetection(frame)
+            t2 = time()
+            fps = 1/np.round(t2-t1, 2)
         cam.stop()
 
 
@@ -43,6 +47,8 @@ class ratDetection:
 def main():
     im = './test_data/test.jpg'
     #runDetection(im)
+    bot = tele.notifier()
+    bot.sendTelegramMsg('I am node!')
     det = ratDetection(captureIndex=0,modelWeight="best.pt", device="cpu")
     det()
 
