@@ -43,11 +43,12 @@ class ratDetection:
         time.sleep(1)
 
         while True:
-            t1 = time.monotonic_ns()
+            t1 = time.monotonic()
             frame = cam.capture_array()
             results = self.runDetection(frame)
-            t2 = time.monotonic_ns()
+            t2 = time.monotonic()
             fps = 1/np.round(t2-t1, 2)
+            print('fps : ' + fps)
         cam.stop()
 
 def main():
