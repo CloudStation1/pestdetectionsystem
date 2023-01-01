@@ -1,12 +1,16 @@
+from io import BytesIO
+import base64
 import torch
 from picamera2 import Picamera2
 from notifier import telegramMsgSender as tele
 import time
 import numpy as np
+from PIL import Image
 
 class ratDetection:
 
-    def __init__(self, captureIndex, modelWeight, device):
+    def __init__(self, telebot, captureIndex, modelWeight, device):
+        self.telebot = telebot
         self.device = device
         self.captureIndex = captureIndex
         self.model = self.loadModel(modelWeight)
@@ -26,8 +30,12 @@ class ratDetection:
     def runDetection(self, frame):
         self.model.to(self.device)
         results = self.model(frame)
-        results.print()
-        results.save()
+        buffered = BytesIO()
+        img_base64 = Image.fromarray(results.ims)
+        img_base64.save(buffered, format="JPEG")
+        print(base64.b64encode(buffered.getvalue()).decode('utf-8'))
+        #results.print()
+        #results.save()
         return results
     
     def __call__(self):
@@ -35,21 +43,17 @@ class ratDetection:
         time.sleep(1)
 
         while True:
-            t1 = time()
+            t1 = time.monotonic_ns()
             frame = cam.capture_array()
-            #results = self.runDetection(frame)
-            t2 = time()
+            results = self.runDetection(frame)
+            t2 = time.monotonic_ns()
             fps = 1/np.round(t2-t1, 2)
         cam.stop()
 
-
-
 def main():
-    im = './test_data/test.jpg'
-    #runDetection(im)
     bot = tele.notifier()
-    bot.sendMsg('I am node!')
-    det = ratDetection(captureIndex=0,modelWeight="best.pt", device="cpu")
+    bot.sendMsg('node started..')
+    det = ratDetection(bot, captureIndex=0, modelWeight="best.pt", device="cpu")
     det()
 
 if __name__ == "__main__":
