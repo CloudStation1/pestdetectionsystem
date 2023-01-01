@@ -48,7 +48,7 @@ def main():
     im = './test_data/test.jpg'
     #runDetection(im)
     bot = tele.notifier()
-    bot.sendTelegramMsg('I am node!')
+    bot.sendMsg('I am node!')
     det = ratDetection(captureIndex=0,modelWeight="best.pt", device="cpu")
     det()
 
