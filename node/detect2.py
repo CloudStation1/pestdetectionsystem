@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 from io import BytesIO
 import base64
 import torch
@@ -6,17 +9,90 @@ from notifier import telegramMsgSender as tele
 import time
 import numpy as np
 from PIL import Image
+import base64
+import json
+import os.path as path
+from datetime import datetime
+import paho.mqtt.client as mqtt
+
+class mqttClient():
+
+    def __init__(self, brokerId, port, topic):
+        self.brokerId = brokerId
+        self.port = port
+        self.topic = topic
+        self.isConnected = False
+        self.client = self.setupConnection()
+
+    def checkResult(self,result):
+        if (result == 0):
+            print('Sent Sucessfully.')
+        else:
+            print('Image(Can not send.')
+
+    def prepareJsonImg(self, data, matchPer):
+        try:
+            #f = open(img, 'rb')
+            #image_byte = base64.b64encode(f.read())
+            #image_str = image_byte.decode('utf-8')  # byte to str
+            #todaydate = datetime.now()
+            data = {
+                'img_name' : 'test',
+                'today_datetime' : datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                'match_percent' : matchPer,
+                'img_content' : data
+            }
+            return json.dumps(data)
+        except Exception as e:
+            print(e)
+
+    def transferData(self, data, matchPer):
+        try:
+            if self.isConnected == False:
+                self.connect()
+            self.client.loop_start()
+            preparedImg = self.prepareJsonImg(data, matchPer)
+            result, count = self.client.publish(self.topic, preparedImg)
+            self.checkResult(result)
+            self.client.loop_stop()
+        except Exception as e:
+            print(e)
+            
+    def setupConnection(self):
+            client = mqtt.Client()
+            client.on_connect = self.on_connect
+            client.on_disconnect = self.on_disconnect
+            return client
+    
+    def connect(self):
+        try:
+            self.client.connect(self.brokerId, self.port)
+        except Exception as e:
+            print(e)
+
+    def on_connect(self, client, userdata, flags, rc):
+        if rc == 0:
+            print('Connected to Broker ' + self.brokerId)
+            self.isConnected = True
+        else:
+            print("Failed to connect, return code %d\n", rc)
+            
+    def on_disconnect(self, client, userdata, rc):
+            print("Disconnected from broker: %d\n", rc)
+            self.isConnected = False
 
 class ratDetection:
 
-    def __init__(self, telebot, captureIndex, modelWeight, device):
+    def __init__(self, telebot, mqttsender, captureIndex, modelWeight, device):
         self.telebot = telebot
         self.device = device
         self.captureIndex = captureIndex
+        self.mqttsender = mqttsender 
         self.model = self.loadModel(modelWeight)
     
     def loadModel(self, modelWeight):
         model = torch.hub.load('ultralytics/yolov5', 'custom', path=modelWeight)
+        model.conf = 0.45
         return model
 
     def setModelConfig(self, confidance=0.4):
@@ -30,12 +106,18 @@ class ratDetection:
     def runDetection(self, frame):
         self.model.to(self.device)
         results = self.model(frame)
-        buffered = BytesIO()
-        img_base64 = Image.fromarray(results.ims)
-        img_base64.save(buffered, format="JPEG")
-        print(base64.b64encode(buffered.getvalue()).decode('utf-8'))
+        #print(results.xyxyn)
+        print(results)
+        results.render()
+        for img in results.ims:
+            #print(len(results.ims))
+            buffered = BytesIO()
+            img_base64 = Image.fromarray(img)
+            img_base64.save(buffered, format="JPEG")
+            #print(base64.b64encode(buffered.getvalue()).decode('utf-8'))
+            self.mqttsender.transferData(base64.b64encode(buffered.getvalue()).decode('utf-8'), '55')
         #results.print()
-        #results.save()
+        #results.save("/home/pi/Desktop/project/results/")
         return results
     
     def __call__(self):
@@ -48,13 +130,15 @@ class ratDetection:
             results = self.runDetection(frame)
             t2 = time.monotonic()
             fps = 1/np.round(t2-t1, 2)
-            print('fps : ' + fps)
+            print(fps)
+             #break
         cam.stop()
 
 def main():
     bot = tele.notifier()
-    bot.sendMsg('node started..')
-    det = ratDetection(bot, captureIndex=0, modelWeight="best.pt", device="cpu")
+    #bot.sendMsg('node started..')
+    mqttsender = mqttClient('192.168.178.39', 32267, 'detect/rat')
+    det = ratDetection(bot, mqttsender, captureIndex=0, modelWeight="best.pt", device="cpu")
     det()
 
 if __name__ == "__main__":
