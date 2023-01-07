@@ -4,13 +4,10 @@ import json
 from datetime import datetime
 date = datetime.now()
 views = Blueprint('views' , __name__)
+
 @views.route('/')
-
-
-
-
 def home():
-    page = requests.args.get('page' , 1 , type=int)
+    #page = requests.args.get('page' , 1 , type=int)
     req = requests.get('https://dummyjson.com/products')
     data = json.loads(req.content)
     return render_template('home.html', data=data, datetime = str(datetime.now()))
