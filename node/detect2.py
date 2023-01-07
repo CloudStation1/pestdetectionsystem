@@ -14,6 +14,23 @@ import json
 import os.path as path
 from datetime import datetime
 import paho.mqtt.client as mqtt
+import logging
+from logging.handlers import RotatingFileHandler
+
+#logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logFile = 'detect2.log'
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
+
+my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, backupCount=2, encoding=None, delay=0)
+
+my_handler.setFormatter(log_formatter)
+my_handler.setLevel(logging.DEBUG)
+
+app_log = logging.getLogger('root')
+app_log.setLevel(logging.DEBUG)
+
+app_log.addHandler(my_handler)
+
 
 class mqttClient():
 
@@ -26,9 +43,9 @@ class mqttClient():
 
     def checkResult(self,result):
         if (result == 0):
-            print('Sent Sucessfully.')
+            app_log.info('Sent Sucessfully.')
         else:
-            print('Image(Can not send.')
+            app_log.error('Image Can not send.')
 
     def prepareJsonImg(self, data, matchPer):
         try:
@@ -44,7 +61,7 @@ class mqttClient():
             }
             return json.dumps(data)
         except Exception as e:
-            print(e)
+            app_log.error(str(e))
 
     def transferData(self, data, matchPer):
         try:
@@ -56,7 +73,7 @@ class mqttClient():
             self.checkResult(result)
             self.client.loop_stop()
         except Exception as e:
-            print(e)
+            app_log.error(str(e))
             
     def setupConnection(self):
             client = mqtt.Client()
@@ -68,17 +85,17 @@ class mqttClient():
         try:
             self.client.connect(self.brokerId, self.port)
         except Exception as e:
-            print(e)
+            app_log.error(str(e))
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            print('Connected to Broker ' + self.brokerId)
+            app_log.info('Connected to Broker ' + self.brokerId)
             self.isConnected = True
         else:
-            print("Failed to connect, return code %d\n", rc)
+            app_log.warning("Failed to connect, return code %d\n", rc)
             
     def on_disconnect(self, client, userdata, rc):
-            print("Disconnected from broker: %d\n", rc)
+            app_log.warning("Disconnected from broker: %d\n", rc)
             self.isConnected = False
 
 class ratDetection:
@@ -92,7 +109,8 @@ class ratDetection:
     
     def loadModel(self, modelWeight):
         model = torch.hub.load('ultralytics/yolov5', 'custom', path=modelWeight)
-        model.conf = 0.45
+        model.conf = 0.60
+        model.iou = 0.45
         return model
 
     def setModelConfig(self, confidance=0.4):
@@ -106,19 +124,15 @@ class ratDetection:
     def runDetection(self, frame):
         self.model.to(self.device)
         results = self.model(frame)
-        #print(results.xyxyn)
-        print(results)
-        results.render()
-        for img in results.ims:
-            #print(len(results.ims))
-            buffered = BytesIO()
-            img_base64 = Image.fromarray(img)
-            img_base64.save(buffered, format="JPEG")
-            #print(base64.b64encode(buffered.getvalue()).decode('utf-8'))
-            self.mqttsender.transferData(base64.b64encode(buffered.getvalue()).decode('utf-8'), '55')
-        #results.print()
-        #results.save("/home/pi/Desktop/project/results/")
-        return results
+        if results.pandas().xyxy[0].empty == False:
+            app_log.info("rat detected")
+            results.render()
+            for img in results.ims:
+                buffered = BytesIO()
+                img_base64 = Image.fromarray(img)
+                img_base64.save(buffered, format="JPEG")
+                #print(base64.b64encode(buffered.getvalue()).decode('utf-8'))
+                self.mqttsender.transferData(base64.b64encode(buffered.getvalue()).decode('utf-8'), '55')
     
     def __call__(self):
         cam = self.get_camera_feed()
@@ -127,11 +141,10 @@ class ratDetection:
         while True:
             t1 = time.monotonic()
             frame = cam.capture_array()
-            results = self.runDetection(frame)
+            self.runDetection(frame)
             t2 = time.monotonic()
             fps = 1/np.round(t2-t1, 2)
-            print(fps)
-             #break
+            app_log.info('Current FPS: ' + str(round(fps,3)))
         cam.stop()
 
 def main():

@@ -1,0 +1,14 @@
+[Unit]
+Description=pest detection software
+After=network-online.target
+
+[Service]
+WorkingDirectory=/home/pi/project/pestdetectionsystem/node
+Type=simple
+Restart=always
+RestartSec=5
+User=$USER
+ExecStart=/usr/bin/env python3 home/pi/project/pestdetectionsystem/node/detect2.py
+
+[Install]
+WantedBy=multi-user.target
