@@ -125,14 +125,16 @@ class ratDetection:
         self.model.to(self.device)
         results = self.model(frame)
         if results.pandas().xyxy[0].empty == False:
-            app_log.info("rat detected")
+            x0, y0, x1, y1, c, d =results.xyxy[0][0]
+            detectionConfidance = np.round(c.numpy().astype(float), 3);
+            app_log.info(f"rat detected with confidance of {detectionConfidance}%")
             results.render()
             for img in results.ims:
                 buffered = BytesIO()
                 img_base64 = Image.fromarray(img)
                 img_base64.save(buffered, format="JPEG")
                 #print(base64.b64encode(buffered.getvalue()).decode('utf-8'))
-                self.mqttsender.transferData(base64.b64encode(buffered.getvalue()).decode('utf-8'), '55')
+                self.mqttsender.transferData(base64.b64encode(buffered.getvalue()).decode('utf-8'), str(detectionConfidance))
     
     def __call__(self):
         cam = self.get_camera_feed()
