@@ -17,6 +17,5 @@ spec:
       containers:
       - name: webapp
         image: dockingsameer/webappimage:latest
-        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
