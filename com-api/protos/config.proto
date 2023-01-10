@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package comm;
-
-message config{
-    optional int confidence=1;
-    optional int imageSize=2;
-}
