@@ -1,0 +1,18 @@
+docker images -a
+sudo kubectl apply -f webapp.yaml
+sudo kubectl describe deployments
+sudo docker rm image
+sudo kubectl run myapp --image dockingsameer/webappimage:latest
+sudo docker ps -a
+sudo docker image rm -f dockingsameer/webappimage
+sudo kubectl delete svc webapp-service
+sudo kubectl delete deployment  webapp-deployment
+sudo docker images ls
+sudo docker images -a
+
+sudo docker push dockingsameer/webappimage:latest
+sudo docker tag webappimage:latest dockingsameer/webappimage:latest
+sudo docker tag webappimage:latest webappimage:latest
+sudo docker push webappimage:latest
+sudo docker tag webappimage:latest dockingsameer/webappimage:latest
+sudo docker push dockingsameer/webappimage:latest
