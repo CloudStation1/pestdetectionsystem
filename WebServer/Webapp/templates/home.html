@@ -9,8 +9,7 @@
     <thead>
       <th>id</th>
       <th>datetime</th>
-      <th>title</th>
-      <th>Description</th>
+      <th>Match</th>
       <th>Image</th>
       
     </thead>
@@ -18,8 +17,7 @@
   <tr>
     <td>{{ prd['id'] }}</td>
     <td>{{ datetime }}</td>
-    <td>{{ prd['title'] }}</td>
-    <td>{{ prd['description'] }}</td>
+    <td></td>
     <td width="110px"><button class="btn btn-primary btn-sm dataimg" data-toggle="modal" data-target="#exampleModal" data-value="{{ prd['thumbnail'] }}">View Image</button></td>
     <!-- <td><img src="{{ prd['thumbnail'] }}" /></td> -->
     
@@ -57,7 +55,8 @@
           </button>
         </div>
         <div class="modal-body">
-          <img id="dimg" style="width:100%;" src="" alt="" />
+          <img style="display:none;" id="dimg" style="width:100%;" src="" alt="" />
+          <img style="width:100%;" src="../static/images/rat-image.jpeg" alt="" />
         </div>
       </div>
     </div>
