@@ -1,41 +1,30 @@
 from flask import Blueprint, render_template
-import requests 
 import json
 from minio import Minio
-from minio.error import InvalidResponseError
-from datetime import datetime
-date = datetime.now()
 views = Blueprint('views' , __name__)
 @views.route('/')
 
-
-
 def home():
-    # page = requests.args.get('page' , 1 , type=int)
-    req = requests.get('https://dummyjson.com/products')
-    data = json.loads(req.content)
-    return render_template('home.html', data=data, datetime = str(datetime.now()))
+    return render_template('home.html', data=getData())
 
-client = Minio('localhost:9000',
-               access_key='ysxJtOY0yK7uPaw6',
-               secret_key='fMYTIXFiHligZikeHxIZTOeZDEglkxRg',
-               secure= False)
+def getMinIOConnection():
+    return Minio(
+        'localhost:9000',
+        access_key='wXMsa1UNIhxrLdeF',
+        secret_key='IscMoplpUPsvrECse4yPURoXHtMugyBB',
+        secure= False)
 
-# Fetch stats on your object.
-if client.bucket_exists("message"):
-    objects = client.list_objects("message")
-    for obj in objects:
-        print(obj)
-
-else:
-    print("my-bucket does not exist")
-
-@views.route("/NodeConfig")
-def NodeConfig():
-    return render_template('NodeConfig.html')
-#  return render_template("home.html")
-
-#  def index():
-    # req = request.get('https://api.zalando.com/brands')
-    # data = json.loads(req.content)
-    # return render_template('index.html', data=data['all'])
+def getData():
+    client = getMinIOConnection()
+    if client.bucket_exists("cloud"):
+        objects = client.list_objects("cloud")
+        newDataObj = []
+        for obj in objects:
+            response = client.get_object(obj.bucket_name,obj.object_name)
+            jsonFileContant = json.loads(response.read())
+            fileName = jsonFileContant['img_name']
+            jsonFileContant['content-type'] = 'image/'+ fileName.split('.')[-1]
+            newDataObj.append(jsonFileContant)
+        return newDataObj
+    else:
+        print("my-bucket does not exist")

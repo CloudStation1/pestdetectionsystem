@@ -7,18 +7,18 @@
 <div class="container" style="margin:20px auto;">
   <table id="table_id" style="margin:20px auto;">
     <thead>
-      <th>id</th>
-      <th>datetime</th>
+      <th>Image</th>
+      <th>Time</th>
       <th>Match</th>
       <th>Image</th>
       
     </thead>
-  {% for prd in data['products'] %}
+  {% for prd in data %}
   <tr>
-    <td>{{ prd['id'] }}</td>
-    <td>{{ datetime }}</td>
-    <td></td>
-    <td width="110px"><button class="btn btn-primary btn-sm dataimg" data-toggle="modal" data-target="#exampleModal" data-value="{{ prd['thumbnail'] }}">View Image</button></td>
+    <td>{{ prd['img_name'] }}</td>
+    <td>{{ prd['today_datetime'] }}</td>
+    <td>{{ prd['match_percent'] }}</td>
+    <td width="110px"><button class="btn btn-primary btn-sm dataimg" data-toggle="modal" data-target="#exampleModal" data-content-type="{{ prd['content-type'] }}" data-value="{{ prd['img_content'] }}">View Image</button></td>
     <!-- <td><img src="{{ prd['thumbnail'] }}" /></td> -->
     
   </tr>
@@ -55,8 +55,8 @@
           </button>
         </div>
         <div class="modal-body">
-          <img style="display:none;" id="dimg" style="width:100%;" src="" alt="" />
-          <img style="width:100%;" src="../static/images/rat-image.jpeg" alt="" />
+          <img id="dimg" style="width:100%;" src="" alt="" />
+          <!-- <img style="width:100%;" src="../static/images/rat-image.jpeg" alt="" /> -->
         </div>
       </div>
     </div>
@@ -64,32 +64,30 @@
   
   <footer class="container py-5">
     <div class="row">
-      <div class="col-12 col-md">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="d-block mb-2" role="img" viewBox="0 0 24 24" focusable="false"><title>Product</title><circle cx="12" cy="12" r="10"/></svg>
-        <small class="d-block mb-3 text-muted">&copy; 2022</small>
-      </div>
       <div class="col-6 col-md">
         <h5>Features</h5>
         <ul class="list-unstyled text-small">
           <li><a class="text-muted" href="#">Image Store</a></li>
-          <li><a class="text-muted" href="#">Image Comparence</a></li>
-          
- 
-         
+          <li><a class="text-muted" href="#">Image Comparence</a></li>         
           <li><a class="text-muted" href="#">Current Date & Time</a></li>
           <li><a class="text-muted" href="#">Caculate Comparison Result</a></li>
-    
+        </ul>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Guidelines under</h5>
+        <ul class="list-unstyled text-small">
+          <li>Prof. Dr. Christian Baun</li>
         </ul>
       </div>
       <div class="col-6 col-md">
         <h5>Team Members</h5>
         <ul class="list-unstyled text-small">
-          <li><a class="text-muted" href="#">Sameer Soni</a></li>
-          <li><a class="text-muted" href="#">Binit </a></li>
-          <li><a class="text-muted" href="#">Jatinkumar Nakrani</a></li>
-          <li><a class="text-muted" href="#">Kaival Akbari</a></li>
-          <li><a class="text-muted" href="#">Usman Tariq</a></li>
-          <li><a class="text-muted" href="#">Santosh</a></li>
+          <!-- <li><a class="text-muted" href="#">Sameer Soni</a></li> -->
+          <li>Sameer Soni</li>
+          <li>Jatinkumar Nakrani</li>
+          <li>Kaival Akbari</li>
+          <li>Usman Tariq</li>
+          <li>Santosh</li>
         </ul>
       </div>
       
