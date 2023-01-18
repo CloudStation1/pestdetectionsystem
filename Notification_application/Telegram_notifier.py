@@ -1,7 +1,7 @@
 
 import Telegram
-a="https://cdn.pixabay.com/photo/2019/04/04/15/17/smartphone-4103051__340.jpg"
+a="https://github.com/CloudStation1/pestdetectionsystem/blob/1361ec75fea982105a83e63420fbfda6af61fb96/WebServer/Webapp/static/images/rat-image.jpeg"
 b="This is Message"
-object=dummy2.Main()
+object=Telegram.Main()
 
 object.Notification(a,b)
