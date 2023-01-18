@@ -51,9 +51,9 @@ class Cluster(CommenFunc):
 
 def main():
     log.debug('mqttreceiver started..')
-    cl = Cluster('192.168.178.38', 32267)
+    cl = Cluster('192.168.2.12', 1883)
     cl.setTopic('detect/rat')
-    cl.setMinIoConfig('192.168.178.38:30544','SvgpyrBtHEp5QEXe','AJess9U1cPLxqejFkDGikM4Is1ftie0e','pestdetection','application/json')
+    cl.setMinIoConfig('192.168.2.12:9000','FdCYXa7zP0ujveAh','j3YyW3bBZ9CIBK58PgZ0B2FkyLec7OJk','pestdetection','application/json')
     cl.subscribe()
 
 if __name__ == "__main__":

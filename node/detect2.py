@@ -152,7 +152,7 @@ class ratDetection:
 def main():
     bot = tele.notifier()
     #bot.sendMsg('node started..')
-    mqttsender = mqttClient('192.168.178.39', 32267, 'detect/rat')
+    mqttsender = mqttClient('192.168.2.12', 31736, 'detect/rat')
     det = ratDetection(bot, mqttsender, captureIndex=0, modelWeight="best.pt", device="cpu")
     det()
 

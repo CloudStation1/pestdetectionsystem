@@ -16,3 +16,14 @@ sudo docker tag webappimage:latest webappimage:latest
 sudo docker push webappimage:latest
 sudo docker tag webappimage:latest dockingsameer/webappimage:latest
 sudo docker push dockingsameer/webappimage:latest
+
+mosquitto_sub -h 192.168.178.40 -p 32267 -v -t 'test/topic'
+mosquitto_pub -h 192.168.178.38 -p 32267 -t 'test/topic' -m "Hello"
+ 
+sudo docker system prune -a
+sudo docker ps -a -f status=running
+sudo docker rm $(docker ps -a -f status=exited -q)
+sudo systemctl restart docker
+ 
+kubectl cordon knode1
+kubectl uncordon knode1
