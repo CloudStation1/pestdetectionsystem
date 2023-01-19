@@ -34,3 +34,16 @@ def getData():
         return newDataObj
     else:
         print("my-bucket does not exist")
+
+def On_ObjectAddition():
+    client = getMinIOConnection()
+    newDataObj = []
+    events = client.listen_bucket_notification('pestdetection', events=['s3:ObjectCreated:*'])
+    for event in events:
+        objname = event['Records'][0]['s3']['object']['key']
+        response = client.get_object('pestdetection', objname)
+        jsonFileContant = json.loads(response.read())
+        fileName = jsonFileContant['img_name']
+        jsonFileContant['content-type'] = 'image/'+ fileName.split('.')[-1]
+        newDataObj.append(jsonFileContant)
+    return render_template('home.html', data=newDataObj)
