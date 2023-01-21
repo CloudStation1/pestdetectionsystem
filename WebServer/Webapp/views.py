@@ -8,8 +8,8 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 views = Blueprint('views' , __name__)
-@views.route('/')
 
+@views.route('/')
 def home():
     return render_template('home.html', data=getData())
 
@@ -21,19 +21,24 @@ def getMinIOConnection():
         secure= False)
 
 def getData():
-    client = getMinIOConnection()
-    if client.bucket_exists("pestdetection"):
-        objects = client.list_objects("pestdetection")
-        newDataObj = []
-        for obj in objects:
-            response = client.get_object(obj.bucket_name,obj.object_name)
-            jsonFileContant = json.loads(response.read())
-            fileName = jsonFileContant['img_name']
-            jsonFileContant['content-type'] = 'image/'+ fileName.split('.')[-1]
-            newDataObj.append(jsonFileContant)
-        return newDataObj
-    else:
-        print("my-bucket does not exist")
+    try:
+        client = getMinIOConnection()
+        if client.bucket_exists("pestdetection"):
+            objects = client.list_objects("pestdetection")
+            newDataObj = []
+            for obj in objects:
+                response = client.get_object(obj.bucket_name,obj.object_name)
+                jsonFileContant = json.loads(response.read())
+                fileName = jsonFileContant['img_name']
+                jsonFileContant['content-type'] = 'image/'+ fileName.split('.')[-1]
+                newDataObj.append(jsonFileContant)
+                log.info('Object file name : ' + fileName)
+            log.info('Total objects found : ' + str(len(newDataObj)))
+            return newDataObj
+        else:
+            log.error("my-bucket does not exist")
+    except Exception as ex:
+        log.exception('exception occured')
 
 def On_ObjectAddition():
     client = getMinIOConnection()
