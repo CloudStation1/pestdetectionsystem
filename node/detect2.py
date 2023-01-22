@@ -5,7 +5,6 @@ from io import BytesIO
 import base64
 import torch
 from picamera2 import Picamera2
-from notifier import telegramMsgSender as tele
 import time
 import numpy as np
 from PIL import Image
@@ -100,8 +99,7 @@ class mqttClient():
 
 class ratDetection:
 
-    def __init__(self, telebot, mqttsender, captureIndex, modelWeight, device):
-        self.telebot = telebot
+    def __init__(self, mqttsender, captureIndex, modelWeight, device):
         self.device = device
         self.captureIndex = captureIndex
         self.mqttsender = mqttsender 
@@ -150,10 +148,8 @@ class ratDetection:
         cam.stop()
 
 def main():
-    bot = tele.notifier()
-    #bot.sendMsg('node started..')
     mqttsender = mqttClient('192.168.2.12', 31736, 'detect/rat')
-    det = ratDetection(bot, mqttsender, captureIndex=0, modelWeight="best.pt", device="cpu")
+    det = ratDetection(mqttsender, captureIndex=0, modelWeight="best.pt", device="cpu")
     det()
 
 if __name__ == "__main__":
