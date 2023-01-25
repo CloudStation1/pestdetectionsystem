@@ -2,6 +2,7 @@ from flask import Blueprint, render_template
 import json
 from minio import Minio
 import logging
+from datetime import datetime
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
@@ -33,17 +34,19 @@ def getData():
                 jsonFileContant['content-type'] = 'image/'+ fileName.split('.')[-1]
                 newDataObj.append(jsonFileContant)
                 log.info('Object file name : ' + fileName)
-            log.info('Total objects found : ' + str(len(newDataObj)))
+            #log.info('Total objects found : ' + str(len(newDataObj)))
+            newDataObj.sort(key=lambda newDataObj: datetime.strptime(newDataObj['today_datetime'], "%d-%m-%Y %H:%M:%S"), reverse=True)
             return newDataObj
         else:
             log.error("my-bucket does not exist")
     except Exception as ex:
         log.exception('exception occured')
 
+@views.route('/update')
 def On_ObjectAddition():
     client = getMinIOConnection()
     newDataObj = []
-    events = client.listen_bucket_notification('pestdetection', events=['s3:ObjectCreated:*'])
+    events = client.listen_bucket_notification('pestdetection', events=['s3:ObjectCreated:*']) 
     for event in events:
         objname = event['Records'][0]['s3']['object']['key']
         response = client.get_object('pestdetection', objname)
@@ -51,4 +54,6 @@ def On_ObjectAddition():
         fileName = jsonFileContant['img_name']
         jsonFileContant['content-type'] = 'image/'+ fileName.split('.')[-1]
         newDataObj.append(jsonFileContant)
-    return render_template('home.html', data=newDataObj)
+        break
+    log.info('new object added in db :', jsonFileContant['img_name'])
+    return newDataObj
