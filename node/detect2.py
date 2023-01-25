@@ -53,7 +53,7 @@ class mqttClient():
             #image_str = image_byte.decode('utf-8')  # byte to str
             #todaydate = datetime.now()
             data = {
-                'img_name' : 'test',
+                'img_name' : 'rat',
                 'today_datetime' : datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
                 'match_percent' : matchPer,
                 'img_content' : data
