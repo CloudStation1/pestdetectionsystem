@@ -27,3 +27,5 @@ sudo systemctl restart docker
  
 kubectl cordon knode1
 kubectl uncordon knode1
+
+kubectl taint node kmaster k3s-controlplane=true:NoSchedule

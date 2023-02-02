@@ -17,8 +17,8 @@ def home():
 def getMinIOConnection():
     return Minio(
         '192.168.2.12:9000',
-        access_key='FdCYXa7zP0ujveAh',
-        secret_key='j3YyW3bBZ9CIBK58PgZ0B2FkyLec7OJk',
+        access_key='minio',
+        secret_key='minio123',
         secure= False)
 
 def getData():
