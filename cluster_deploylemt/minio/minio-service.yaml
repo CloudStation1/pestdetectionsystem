@@ -10,8 +10,8 @@ spec:
       targetPort: 9000
       protocol: TCP
     - name: browser
-      port: 39555
-      targetPort: 39555
+      port: 41117
+      targetPort: 41117
       protocol: TCP
   selector:
     app: minio
