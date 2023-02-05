@@ -28,6 +28,11 @@ class Cluster(CommenFunc):
                 if client.bucket_exists(self.bucketName):
                     client.put_object(self.bucketName, self.getJsonFileName(), io.BytesIO(msg.payload), len(msg.payload), content_type = self.contentType)
                     log.info('File uploaded to Minio')
+                else:
+                    log.info('bucket does not exists, so creating one..')
+                    client.make_bucket(self.bucketName)
+                    client.put_object(self.bucketName, self.getJsonFileName(), io.BytesIO(msg.payload), len(msg.payload), content_type = self.contentType)
+                    log.info('File uploaded to Minio')
         except Exception as e:
             log.exception('exception occured')
 
@@ -53,7 +58,7 @@ def main():
     log.debug('mqttreceiver started..')
     cl = Cluster('192.168.2.12', 1883)
     cl.setTopic('detect/rat')
-    cl.setMinIoConfig('192.168.2.12:9000','FdCYXa7zP0ujveAh','j3YyW3bBZ9CIBK58PgZ0B2FkyLec7OJk','pestdetection','application/json')
+    cl.setMinIoConfig('192.168.2.12:9000','minio','minio123','pestdetection','application/json')
     cl.subscribe()
 
 if __name__ == "__main__":

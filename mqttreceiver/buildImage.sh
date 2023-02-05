@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo docker build -t mqttreceiverimage .
+sudo docker build -t dockingsameer/mqttreceiverimage .
